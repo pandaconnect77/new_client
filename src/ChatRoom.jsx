@@ -98,11 +98,7 @@ const ChatRoom = ({ role }) => {
           {messages.map((msg) => (
             <div
               key={msg._id}
-              className={`relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${
-                msg.sender === 'F'
-                  ? 'bg-blue-200 text-black ml-auto text-left'
-                  : 'bg-gray-200 text-black mr-auto text-left'
-              }`}
+              className={`relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${msg.sender === 'F' ? 'bg-blue-200 text-black ml-auto text-left' : 'bg-gray-200 text-black mr-auto text-left'}`}
             >
               {msg.text && <div>{msg.text}</div>}
               {msg.image && (
@@ -134,7 +130,7 @@ const ChatRoom = ({ role }) => {
         </div>
 
         {/* Message Input Area */}
-        <div className="flex items-center gap-3 p-4 border-t border-gray-200 bg-white">
+        <div className="flex items-center gap-3 p-4 border-t border-gray-200 bg-white flex-wrap sm:flex-nowrap">
           {/* Emoji Button */}
           <button
             onClick={() => setShowEmojiPicker(prev => !prev)}

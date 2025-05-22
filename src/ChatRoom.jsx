@@ -135,7 +135,7 @@ const ChatRoom = ({ role }) => {
   // Send message with optional image/file
   const sendMessage = () => {
     if (text.trim() || file) {
-      const msg = { text, sender: role };
+      const msg = { text: text.trim(), sender: role };
 
       if (file) {
         const reader = new FileReader();
@@ -158,7 +158,7 @@ const ChatRoom = ({ role }) => {
   // Delete a chat message by id
   const deleteChatMessage = async (id) => {
     try {
-      await axios.delete(https://new-a5px.onrender.com/messages/${id});
+      await axios.delete(`https://new-a5px.onrender.com/messages/${id}`);
     } catch (err) {
       console.error('Failed to delete message:', err);
     }
@@ -206,13 +206,13 @@ const ChatRoom = ({ role }) => {
 
   // Download a file by filename
   const handleDownload = (filename) => {
-    window.open(https://new-a5px.onrender.com/files/${filename}, '_blank');
+    window.open(`https://new-a5px.onrender.com/files/${filename}`, '_blank');
   };
 
   // Delete a file by filename
   const handleDeleteFile = async (filename) => {
     try {
-      await axios.delete(https://new-a5px.onrender.com/files/${filename});
+      await axios.delete(`https://new-a5px.onrender.com/files/${filename}`);
       fetchFiles();
     } catch (err) {
       console.error('Delete failed:', err);
@@ -239,9 +239,9 @@ const ChatRoom = ({ role }) => {
       </div>
 
       <div
-        className={h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
+        className={`h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
           isBlurred ? 'blur-3xl' : ''
-        }}
+        }`}
       >
         {/* Chat Room */}
         <motion.div
@@ -255,9 +255,9 @@ const ChatRoom = ({ role }) => {
             <span>💬 One-to-One Chat</span>
             <span className="flex items-center text-sm gap-2">
               <span
-                className={h-2 w-2 rounded-full ${
+                className={`h-2 w-2 rounded-full ${
                   onlineUsers > 0 ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
-                }}
+                }`}
               ></span>
               Online: {onlineUsers}
             </span>
@@ -271,121 +271,108 @@ const ChatRoom = ({ role }) => {
           )}
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+          <div
+            className="flex-1 overflow-y-auto p-6 space-y-4"
+            id="chat-container"
+            aria-live="polite"
+          >
             {messages.map((msg) => (
               <motion.div
                 key={msg._id}
-                className={relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${
-                  msg.sender === 'F'
-                    ? 'bg-blue-200 text-black ml-auto text-left'
-                    : 'bg-gray-200 text-black mr-auto text-left'
-                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
+                className={`flex ${
+                  msg.sender === role ? 'justify-end' : 'justify-start'
+                }`}
               >
-                {msg.text && <div>{msg.text}</div>}
-                {msg.image && (
-                  <div className="mt-2">
+                <div
+                  className={`max-w-xs md:max-w-md break-words p-3 rounded-xl shadow-md ${
+                    msg.sender === role
+                      ? 'bg-purple-500 text-white rounded-br-none'
+                      : 'bg-gray-200 text-gray-900 rounded-bl-none'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="whitespace-pre-wrap">{msg.text}</p>
+                    <button
+                      aria-label="Delete message"
+                      className="ml-2 text-red-400 hover:text-red-700"
+                      onClick={() => deleteChatMessage(msg._id)}
+                    >
+                      <FaRegTrashAlt />
+                    </button>
+                  </div>
+                  {msg.image && (
                     <img
-                      src={data:image/jpeg;base64,${msg.image}}
-                      alt="Uploaded"
-                      className="max-w-xs h-auto rounded-md"
+                      src={`data:image/png;base64,${msg.image}`}
+                      alt="Sent image"
+                      className="rounded-lg mt-2 max-w-full max-h-60 object-contain"
+                      loading="lazy"
                     />
-                    <a
-                      href={data:image/jpeg;base64,${msg.image}}
-                      download={image_${msg._id}.jpg}
-                      className="text-xs text-blue-600 underline block mt-1"
-                    >
-                      Download Image
-                    </a>
+                  )}
+                  <div className="text-xs text-right text-gray-500 mt-1 select-none">
+                    {msg.timestamp
+                      ? new Date(msg.timestamp).toLocaleTimeString()
+                      : ''}
+                    {' '}
+                    {readStatus[msg._id] === 'read' && (
+                      <span className="ml-1 text-green-500">✓✓</span>
+                    )}
+                    {readStatus[msg._id] === 'sent' && (
+                      <span className="ml-1 text-gray-400">✓</span>
+                    )}
                   </div>
-                )}
-                {msg.file && (
-                  <div className="mt-2">
-                    <a
-                      href={https://new-a5px.onrender.com/files/${msg.file}}
-                      download={msg.file}
-                      className="text-xs text-blue-600 underline block mt-1"
-                    >
-                      Download File: {msg.file}
-                    </a>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => deleteChatMessage(msg._id)}
-                  title="Delete message"
-                  className="absolute top-1 right-1 text-red-500 hover:text-red-700"
-                  aria-label="Delete message"
-                >
-                  <FaRegTrashAlt />
-                </button>
-
-                <span
-                  className={absolute bottom-0 right-1 text-xs ${
-                    readStatus[msg._id] === 'read' ? 'text-green-600' : 'text-gray-400'
-                  }}
-                  aria-label={
-                    readStatus[msg._id] === 'read' ? 'Read' : 'Sent'
-                  }
-                >
-                  {readStatus[msg._id] === 'read' ? '✓✓' : '✓'}
-                </span>
+                </div>
               </motion.div>
             ))}
+
             <div ref={messagesEndRef} />
           </div>
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="p-2 text-gray-600 italic text-sm">
-              {role === 'F' ? 'You' : 'Friend'} is typing...
+            <div className="text-gray-600 p-2 text-center text-sm animate-pulse select-none">
+              Typing...
             </div>
           )}
 
-          {/* Input Area */}
-          <div className="bg-gray-100 px-6 py-4 flex items-center space-x-3">
+          {/* Input Section */}
+          <div className="px-4 py-3 flex items-center border-t border-gray-300 bg-white">
             <button
-              onClick={() => setShowEmojiPicker((prev) => !prev)}
-              aria-label="Toggle emoji picker"
-              className="text-2xl"
+              aria-label="Toggle Emoji Picker"
+              onClick={() => setShowEmojiPicker((val) => !val)}
+              className="mr-2 text-xl text-gray-600 hover:text-purple-500 transition"
             >
               <FaRegSmile />
             </button>
 
-            {showEmojiPicker && (
-              <div className="absolute bottom-16 left-6 z-50">
-                <EmojiPicker onEmojiClick={onEmojiClick} />
-              </div>
-            )}
-
-           <input
-    ref={inputRef}
-    type="text"
-    placeholder="Type a message..."
-    className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none"
-    value={text}
-    onChange={handleTyping}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    }}
-  />
-
+            <input
+              ref={inputRef}
+              type="text"
+              aria-label="Message input"
+              placeholder="Type your message..."
+              value={text}
+              onChange={handleTyping}
+              className="flex-grow px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+            />
 
             <input
               type="file"
+              id="fileInput"
               onChange={(e) => setFile(e.target.files[0])}
               className="hidden"
-              id="file-upload"
+              accept="image/*"
             />
             <label
-              htmlFor="file-upload"
-              className="cursor-pointer px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-              title="Attach file"
+              htmlFor="fileInput"
+              className="ml-2 px-3 py-2 bg-purple-500 hover:bg-purple-600 rounded-full text-white cursor-pointer"
+              title="Attach image"
             >
               📎
             </label>
@@ -393,90 +380,91 @@ const ChatRoom = ({ role }) => {
             <button
               onClick={sendMessage}
               disabled={!text.trim() && !file}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
               aria-label="Send message"
+              className="ml-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Send
             </button>
           </div>
+
+          {/* Emoji Picker */}
+          {showEmojiPicker && (
+            <div className="absolute bottom-20 left-4 z-50">
+              <EmojiPicker onEmojiClick={onEmojiClick} />
+            </div>
+          )}
         </motion.div>
 
-        {/* Files Panel */}
+        {/* Files Section */}
         <motion.div
-          className="w-full sm:w-1/3 max-w-xl mt-6 sm:mt-0 bg-white rounded-2xl shadow-2xl flex flex-col p-6 overflow-auto h-[90vh]"
+          className="w-full sm:w-1/3 mt-6 sm:mt-0 max-w-md h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl font-semibold mb-4 text-center text-purple-700">
-            Shared Files
-          </h2>
+          <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6">
+            Files Upload & Download
+          </div>
 
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="mb-3"
-            aria-label="Select file to upload"
-          />
-          <button
-            onClick={handleUpload}
-            disabled={uploading || !selectedFile}
-            className="mb-6 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
-          >
-            {uploading ? 'Uploading...' : 'Upload File'}
-          </button>
+          <div className="flex flex-col flex-grow p-4 overflow-y-auto space-y-4">
+            {/* File upload controls */}
+            <div className="flex flex-col space-y-2">
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="file-input file-input-bordered file-input-primary w-full"
+                aria-label="Select file to upload"
+              />
+              <button
+                onClick={handleUpload}
+                disabled={!selectedFile || uploading}
+                className="btn btn-primary"
+                aria-disabled={!selectedFile || uploading}
+              >
+                {uploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </div>
 
-          <div className="flex-1 overflow-y-auto space-y-3">
-            {files.length === 0 ? (
-              <p className="text-gray-500 text-center">No files uploaded yet.</p>
-            ) : (
-              files.map(({ filename }) => (
-                <div
-                  key={filename}
-                  className="flex justify-between items-center bg-gray-100 rounded px-4 py-2"
-                >
-                  <span className="truncate max-w-xs">{filename}</span>
-                  <div className="space-x-3">
-                    <button
-                      onClick={() => handleDownload(filename)}
-                      className="text-blue-600 hover:underline"
-                      aria-label={Download ${filename}}
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFile(filename)}
-                      className="text-red-600 hover:underline"
-                      aria-label={Delete ${filename}}
-                    >
-                      Delete
-                    </button>
+            {/* List of files */}
+            <div className="flex-grow overflow-y-auto">
+              {files.length > 0 ? (
+                files.map((filename) => (
+                  <div
+                    key={filename}
+                    className="flex justify-between items-center p-2 border-b border-gray-200"
+                  >
+                    <span className="truncate max-w-xs">{filename}</span>
+                    <div className="space-x-2">
+                      <button
+                        onClick={() => handleDownload(filename)}
+                        aria-label={`Download ${filename}`}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Download
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFile(filename)}
+                        aria-label={`Delete ${filename}`}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              ) : (
+                <p className="text-gray-500">No files uploaded yet.</p>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Analytics and Speed Insights */}
+      {/* Vercel Analytics & Speed Insights */}
       <Analytics />
       <SpeedInsights />
-
-      {/* Blurred overlay */}
-      {isBlurred && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-          onClick={() => setIsBlurred(false)}
-          role="button"
-          tabIndex={0}
-          aria-label="Dismiss overlay"
-        >
-          <div className="text-white text-2xl cursor-pointer">Click to Unblur</div>
-        </div>
-      )}
     </>
   );
 };
 
-export default ChatRoom; 
+export default ChatRoom;

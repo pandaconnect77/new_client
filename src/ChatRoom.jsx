@@ -7,7 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react"
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { motion } from 'framer-motion';
-
+const adRef = useRef(null);
 const socket = io('https://new-a5px.onrender.com');
 
 const ChatRoom = ({ role }) => {
@@ -38,6 +38,13 @@ const ChatRoom = ({ role }) => {
         [msg._id]: 'sent',
       }));
     });
+     useEffect(() => {
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.error('Adsense error', e);
+    }
+  }, []);
 
     socket.on('deleteMessage', (id) => setMessages((prev) => prev.filter((m) => m._id !== id)));
     socket.on('updateOnlineUsers', (count) => setOnlineUsers(count));
@@ -185,7 +192,20 @@ const ChatRoom = ({ role }) => {
     fetchFiles();
   }, []);
 
-  return (
+  return ( <>
+  <div style={{ marginTop: 0, textAlign: 'center' }}>
+        <ins
+          className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-client="ca-pub-1417536970473743"
+          data-ad-slot="6635972753"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+          ref={adRef}
+        />
+      </div>
+  
+  
     <div className={`h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${isBlurred ? 'blur-3xl' : ''}`}>
       {/* Chat Room */}
       <motion.div
@@ -298,7 +318,7 @@ const ChatRoom = ({ role }) => {
           ))}
         </ul>
       </motion.div>
-    </div>
+    </div> </>
   );
 };
 

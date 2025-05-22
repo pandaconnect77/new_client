@@ -222,40 +222,40 @@ const ChatRoom = ({ role }) => {
           </div>
         </div>
       </motion.div>
-      <Analytics />
-      <SpeedInsights />
-    </div>
 
+      {/* File Manager */}
       <motion.div
-        className="w-full sm:w-1/3 max-w-6xl bg-white rounded-2xl shadow-lg p-6 mt-6 sm:mt-0 sm:ml-6"
+        className="max-w-4xl mx-auto p-4 mt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-xl font-semibold mb-4 text-purple-700">📁 File Manager</h2>
-        <div className="mb-4 flex items-center gap-2">
-          <input type="file" onChange={handleFileChange} />
-          <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 bg-blue-600 text-white rounded">
-            {uploading ? 'Uploading...' : 'Upload'}
-          </button>
+        <div className="w-full bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 text-purple-700">📁 File Manager</h2>
+          <div className="mb-4 flex items-center gap-2">
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 bg-blue-600 text-white rounded">
+              {uploading ? 'Uploading...' : 'Upload'}
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {files.map((file) => (
+              <li key={file._id} className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded">
+                <span>{file.filename}</span>
+                <div>
+                  <button onClick={() => handleDownload(file.filename)} className="px-2 py-1 mr-2 bg-green-500 text-white rounded">Download</button>
+                  <button onClick={() => handleDeleteFile(file.filename)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="space-y-2">
-          {files.map((file) => (
-            <li key={file._id} className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded">
-              <span>{file.filename}</span>
-              <div>
-                <button onClick={() => handleDownload(file.filename)} className="px-2 py-1 mr-2 bg-green-500 text-white rounded">Download</button>
-                <button onClick={() => handleDeleteFile(file.filename)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
       </motion.div>
-    </div> </>
+
+      <Analytics />
+      <SpeedInsights />
+    </div>
   );
 };
 
-export default ChatRoom; 
-      
-     
-
+export default ChatRoom;

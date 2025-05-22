@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
+
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { motion } from 'framer-motion';

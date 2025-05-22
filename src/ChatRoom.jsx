@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/react";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { motion } from 'framer-motion';
@@ -27,32 +26,25 @@ const ChatRoom = ({ role }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [readStatus, setReadStatus] = useState({});
 
-  // Initialize socket once on mount
   useEffect(() => {
     socket.current = io('https://new-a5px.onrender.com');
 
-    // Fetch initial messages
     axios.get('https://new-a5px.onrender.com/messages')
-      .then((res) => setMessages(res.data))
+      .then(res => setMessages(res.data))
       .catch(console.error);
 
-    // Notify server user connected
     socket.current.emit('userConnected', role);
 
-    // Socket event listeners
     socket.current.on('message', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      setReadStatus((prevStatus) => ({ ...prevStatus, [msg._id]: 'sent' }));
+      setMessages(prev => [...prev, msg]);
+      setReadStatus(prev => ({ ...prev, [msg._id]: 'sent' }));
     });
 
     socket.current.on('deleteMessage', (id) => {
-      setMessages((prev) => prev.filter((m) => m._id !== id));
+      setMessages(prev => prev.filter(m => m._id !== id));
     });
 
-    socket.current.on('updateOnlineUsers', (count) => {
-      setOnlineUsers(count);
-    });
-
+    socket.current.on('updateOnlineUsers', setOnlineUsers);
     socket.current.on('userStatus', (msg) => {
       setConnectionStatus(msg);
       setTimeout(() => setConnectionStatus(''), 15000);
@@ -60,71 +52,49 @@ const ChatRoom = ({ role }) => {
 
     socket.current.on('typing', () => setIsTyping(true));
     socket.current.on('stopTyping', () => setIsTyping(false));
-
     socket.current.on('readMessage', (messageId) => {
-      setReadStatus((prevStatus) => ({ ...prevStatus, [messageId]: 'read' }));
+      setReadStatus(prev => ({ ...prev, [messageId]: 'read' }));
     });
 
-    // Adsense push
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (e) {
       console.error('Adsense error', e);
     }
 
-    // Keyboard events
-    const handleTabPress = (event) => {
+    const handleKeyEvents = (event) => {
       if (event.key === 'Tab') {
         event.preventDefault();
         window.open('https://www.google.com/', '_blank');
-      }
-    };
-
-    const handleF1Press = (event) => {
-      if (event.key === 'F1' || event.key === 'Shift') {
+      } else if (event.key === 'F1' || event.key === 'Shift') {
         event.preventDefault();
         setIsBlurred(true);
       }
     };
 
-    window.addEventListener('keydown', handleTabPress);
-    window.addEventListener('keydown', handleF1Press);
+    window.addEventListener('keydown', handleKeyEvents);
 
-    // Cleanup on unmount
     return () => {
       socket.current.emit('userDisconnected', role);
-      socket.current.off('message');
-      socket.current.off('deleteMessage');
-      socket.current.off('updateOnlineUsers');
-      socket.current.off('userStatus');
-      socket.current.off('typing');
-      socket.current.off('stopTyping');
-      socket.current.off('readMessage');
-      window.removeEventListener('keydown', handleTabPress);
-      window.removeEventListener('keydown', handleF1Press);
       socket.current.disconnect();
+      window.removeEventListener('keydown', handleKeyEvents);
     };
   }, [role]);
 
-  // Scroll to bottom on messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Auto-focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Handle typing event with throttling
   const handleTyping = (e) => {
     setText(e.target.value);
-
     if (!isTyping) {
       setIsTyping(true);
       socket.current.emit('typing', { sender: role });
     }
-
     clearTimeout(window.typingTimeout);
     window.typingTimeout = setTimeout(() => {
       setIsTyping(false);
@@ -132,200 +102,130 @@ const ChatRoom = ({ role }) => {
     }, 1500);
   };
 
-  // Send message with optional image/file
   const sendMessage = () => {
     if (text.trim() || file) {
       const msg = { text, sender: role };
-
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          const imageData = reader.result.split(',')[1];
-          msg.image = imageData;
+          msg.image = reader.result.split(',')[1];
           socket.current.emit('sendMessage', msg);
         };
         reader.readAsDataURL(file);
       } else {
         socket.current.emit('sendMessage', msg);
       }
-
       setText('');
       setFile(null);
       setShowEmojiPicker(false);
     }
   };
 
-  // Delete a chat message by id
   const deleteChatMessage = async (id) => {
     try {
       await axios.delete(`https://new-a5px.onrender.com/messages/${id}`);
     } catch (err) {
-      console.error('Failed to delete message:', err);
+      console.error('Delete failed', err);
     }
   };
 
-  // Emoji picker click handler
   const onEmojiClick = (emojiData) => {
-    setText((prev) => prev + emojiData.emoji);
+    setText(prev => prev + emojiData.emoji);
   };
 
-  // Fetch uploaded files list
   const fetchFiles = async () => {
     try {
       const res = await axios.get('https://new-a5px.onrender.com/files');
       setFiles(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error('Error fetching files:', err);
+      console.error('Fetch files failed', err);
       setFiles([]);
     }
   };
 
-  // Handle file select for upload
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
-  // Upload selected file
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
-
     const formData = new FormData();
     formData.append('file', selectedFile);
-
     try {
       await axios.post('https://new-a5px.onrender.com/upload', formData);
       setSelectedFile(null);
       fetchFiles();
     } catch (err) {
-      console.error('Upload failed:', err);
+      console.error('Upload failed', err);
     } finally {
       setUploading(false);
     }
   };
 
-  // Download a file by filename
   const handleDownload = (filename) => {
     window.open(`https://new-a5px.onrender.com/files/${filename}`, '_blank');
   };
 
-  // Delete a file by filename
   const handleDeleteFile = async (filename) => {
     try {
       await axios.delete(`https://new-a5px.onrender.com/files/${filename}`);
       fetchFiles();
     } catch (err) {
-      console.error('Delete failed:', err);
+      console.error('Delete file failed', err);
     }
   };
 
-  // Fetch files on mount
   useEffect(() => {
     fetchFiles();
   }, []);
 
   return (
-    <>
-      <div style={{ marginTop: 0, textAlign: 'center' }}>
-        <ins
-          className="adsbygoogle"
-          style={{ display: 'block' }}
-          data-ad-client="ca-pub-1417536970473743"
-          data-ad-slot="6635972753"
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-          ref={adRef}
-        />
-      </div>
-          
-    <div className={h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${isBlurred ? 'blur-3xl' : ''}}>
-      {/* Chat Room */}
-      <motion.div
-        className="w-full sm:w-2/3 max-w-6xl h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden relative sm:mr-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Header */}
-        <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 flex justify-between items-center">
-          <span>💬 One-to-One Chat</span>
-          <span className="flex items-center text-sm gap-2">
-            <span className={h-2 w-2 rounded-full ${onlineUsers > 0 ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}}></span>
-            Online: {onlineUsers}
-          </span>
-        </div>
-
-        {/* Connection Status */}
-        {connectionStatus && (
-          <div className="bg-yellow-200 text-yellow-800 text-center py-1 text-md">
-            {connectionStatus}
+    <div className={`min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 ${isBlurred ? 'blur-3xl' : ''}`}>
+      <div ref={adRef}></div>
+      <motion.div className="max-w-4xl mx-auto p-4">
+        <div className="bg-white rounded-xl shadow-lg h-[90vh] flex flex-col">
+          <div className="bg-purple-600 text-white py-4 px-6 flex justify-between">
+            <span>💬 Chat</span>
+            <span className="text-sm">Online: {onlineUsers}</span>
           </div>
-        )}
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-          {messages.map((msg) => (
-            <motion.div
-              key={msg._id}
-              className={relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${msg.sender === 'F' ? 'bg-blue-200 text-black ml-auto text-left' : 'bg-gray-200 text-black mr-auto text-left'}}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {msg.text && <div>{msg.text}</div>}
-              {msg.image && (
-                <div className="mt-2">
-                  <img src={data:image/jpeg;base64,${msg.image}} alt="Uploaded" className="max-w-xs h-auto rounded-md" />
-                  <a href={data:image/jpeg;base64,${msg.image}} download={image_${msg._id}.jpg} className="text-xs text-blue-600 underline block mt-1">Download Image</a>
+          {connectionStatus && <div className="bg-yellow-300 text-center py-1">{connectionStatus}</div>}
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map(msg => (
+              <motion.div
+                key={msg._id}
+                className={`relative p-3 rounded-md shadow w-fit max-w-[70%] ${msg.sender === 'F' ? 'bg-blue-200 ml-auto' : 'bg-gray-300 mr-auto'}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}>
+                {msg.text && <div>{msg.text}</div>}
+                {msg.image && <img src={`data:image/jpeg;base64,${msg.image}`} alt="" className="mt-2 max-w-xs rounded" />}
+                <div className="text-xs text-right mt-1">
+                  {new Date(msg.createdAt).toLocaleTimeString()} {readStatus[msg._id] === 'read' ? '✓✓' : '✓'}
                 </div>
-              )}
-              {msg.file && (
-                <div className="mt-2">
-                  <a href={https://new-a5px.onrender.com/files/${msg.file}} download={msg.file} className="text-xs text-blue-600 underline block mt-1">
-                    Download File: {msg.file}
-                  </a>
-                </div>
-              )}
-              <div className="absolute right-2 bottom-1 text-xs text-black">
-                <span>{new Date(msg.createdAt).toLocaleTimeString()}</span>
-                {readStatus[msg._id] === 'read' && <span className="text-green-500 text-xs ml-2">✓✓</span>}
-                {readStatus[msg._id] === 'sent' && <span className="text-gray-500 text-xs ml-2">✓</span>}
-              </div>
-              <button onClick={() => deleteChatMessage(msg._id)} className="absolute top-2 right-0 text-red-500 text-xl rounded px-1">
-                <FaRegTrashAlt />
-              </button>
-            </motion.div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {isTyping && <div className="text-green-700 text-md px-6 py-2">Someone is typing...</div>}
-
-        {/* Input Section */}
-        <div className="flex items-center gap-3 p-4 border-t border-gray-200 bg-white flex-wrap sm:flex-nowrap">
-          <button onClick={() => setShowEmojiPicker((prev) => !prev)} className="text-2xl text-yellow-500"><FaRegSmile /></button>
-          <label htmlFor="file-input" className="cursor-pointer text-2xl">📎</label>
-          <input id="file-input" type="file" onChange={(e) => setFile(e.target.files[0])} className="hidden" />
-          <input
-            ref={inputRef}
-            value={text}
-            onChange={handleTyping}
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="Type your message..."
-          />
-          <button onClick={sendMessage} className="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition">Send</button>
-        </div>
-
-        {showEmojiPicker && (
-          <div className="absolute bottom-24 left-10 z-50">
-            <EmojiPicker onEmojiClick={onEmojiClick} />
+                <button onClick={() => deleteChatMessage(msg._id)} className="absolute top-1 right-1 text-red-600">
+                  <FaRegTrashAlt />
+                </button>
+              </motion.div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-        )}
+
+          {isTyping && <div className="text-green-600 px-6">Someone is typing...</div>}
+
+          <div className="border-t p-4 flex items-center gap-2">
+            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="text-2xl"><FaRegSmile /></button>
+            {showEmojiPicker && <EmojiPicker onEmojiClick={onEmojiClick} />}
+            <input type="file" onChange={(e) => setFile(e.target.files[0])} className="hidden" id="chat-file" />
+            <label htmlFor="chat-file" className="cursor-pointer">📎</label>
+            <input ref={inputRef} value={text} onChange={handleTyping} className="flex-1 border px-2 py-1 rounded" />
+            <button onClick={sendMessage} className="bg-purple-600 text-white px-3 py-1 rounded">Send</button>
+          </div>
+        </div>
       </motion.div>
-     <Analytics />
+      <Analytics />
       <SpeedInsights />
-      {/* File Manager */}
+    </div>
+
       <motion.div
         className="w-full sm:w-1/3 max-w-6xl bg-white rounded-2xl shadow-lg p-6 mt-6 sm:mt-0 sm:ml-6"
         initial={{ opacity: 0 }}

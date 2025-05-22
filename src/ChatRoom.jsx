@@ -237,239 +237,125 @@ const ChatRoom = ({ role }) => {
           ref={adRef}
         />
       </div>
-
-      <div
-        className={`h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
-          isBlurred ? 'blur-3xl' : ''
-        }`}
+          
+    <div className={h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${isBlurred ? 'blur-3xl' : ''}}>
+      {/* Chat Room */}
+      <motion.div
+        className="w-full sm:w-2/3 max-w-6xl h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden relative sm:mr-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        {/* Chat Room */}
-        <motion.div
-          className="w-full sm:w-2/3 max-w-6xl h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden relative sm:mr-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Header */}
-          <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 flex justify-between items-center">
-            <span>💬 One-to-One Chat</span>
-            <span className="flex items-center text-sm gap-2">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  onlineUsers > 0 ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
-                }`}
-              ></span>
-              Online: {onlineUsers}
-            </span>
-          </div>
-
-          {/* Connection Status */}
-          {connectionStatus && (
-            <div className="bg-yellow-200 text-yellow-800 text-center py-1 text-md">
-              {connectionStatus}
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-            {messages.map((msg) => (
-              <motion.div
-                key={msg._id}
-                className={`relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${
-                  msg.sender === 'F'
-                    ? 'bg-blue-200 text-black ml-auto text-left'
-                    : 'bg-gray-200 text-black mr-auto text-left'
-                }`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                {msg.text && <div>{msg.text}</div>}
-                {msg.image && (
-                  <div className="mt-2">
-                    <img
-                      src={`data:image/jpeg;base64,${msg.image}`}
-                      alt="Uploaded"
-                      className="max-w-xs h-auto rounded-md"
-                    />
-                    <a
-                      href={`data:image/jpeg;base64,${msg.image}`}
-                      download={`image_${msg._id}.jpg`}
-                      className="text-xs text-blue-600 underline block mt-1"
-                    >
-                      Download Image
-                    </a>
-                  </div>
-                )}
-                {msg.file && (
-                  <div className="mt-2">
-                    <a
-                      href={`https://new-a5px.onrender.com/files/${msg.file}`}
-                      download={msg.file}
-                      className="text-xs text-blue-600 underline block mt-1"
-                    >
-                      Download File: {msg.file}
-                    </a>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => deleteChatMessage(msg._id)}
-                  title="Delete message"
-                  className="absolute top-1 right-1 text-red-500 hover:text-red-700"
-                  aria-label="Delete message"
-                >
-                  <FaRegTrashAlt />
-                </button>
-
-                <span
-                  className={`absolute bottom-0 right-1 text-xs ${
-                    readStatus[msg._id] === 'read' ? 'text-green-600' : 'text-gray-400'
-                  }`}
-                  aria-label={
-                    readStatus[msg._id] === 'read' ? 'Read' : 'Sent'
-                  }
-                >
-                  {readStatus[msg._id] === 'read' ? '✓✓' : '✓'}
-                </span>
-              </motion.div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="p-2 text-gray-600 italic text-sm">
-              {role === 'F' ? 'You' : 'Friend'} is typing...
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="bg-gray-100 px-6 py-4 flex items-center space-x-3">
-            <button
-              onClick={() => setShowEmojiPicker((prev) => !prev)}
-              aria-label="Toggle emoji picker"
-              className="text-2xl"
-            >
-              <FaRegSmile />
-            </button>
-
-            {showEmojiPicker && (
-              <div className="absolute bottom-16 left-6 z-50">
-                <EmojiPicker onEmojiClick={onEmojiClick} />
-              </div>
-            )}
-
-            <input
-              ref={inputRef}
-              type="text"
-              value={text}
-              onChange={handleTyping}
-              placeholder="Type a message..."
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-
-            <input
-              type="file"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="hidden"
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              className="cursor-pointer px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-              title="Attach file"
-            >
-              📎
-            </label>
-
-            <button
-              onClick={sendMessage}
-              disabled={!text.trim() && !file}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
-              aria-label="Send message"
-            >
-              Send
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Files Panel */}
-        <motion.div
-          className="w-full sm:w-1/3 max-w-xl mt-6 sm:mt-0 bg-white rounded-2xl shadow-2xl flex flex-col p-6 overflow-auto h-[90vh]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-2xl font-semibold mb-4 text-center text-purple-700">
-            Shared Files
-          </h2>
-
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="mb-3"
-            aria-label="Select file to upload"
-          />
-          <button
-            onClick={handleUpload}
-            disabled={uploading || !selectedFile}
-            className="mb-6 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
-          >
-            {uploading ? 'Uploading...' : 'Upload File'}
-          </button>
-
-          <div className="flex-1 overflow-y-auto space-y-3">
-            {files.length === 0 ? (
-              <p className="text-gray-500 text-center">No files uploaded yet.</p>
-            ) : (
-              files.map(({ filename }) => (
-                <div
-                  key={filename}
-                  className="flex justify-between items-center bg-gray-100 rounded px-4 py-2"
-                >
-                  <span className="truncate max-w-xs">{filename}</span>
-                  <div className="space-x-3">
-                    <button
-                      onClick={() => handleDownload(filename)}
-                      className="text-blue-600 hover:underline"
-                      aria-label={`Download ${filename}`}
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFile(filename)}
-                      className="text-red-600 hover:underline"
-                      aria-label={`Delete ${filename}`}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Analytics and Speed Insights */}
-      <Analytics />
-      <SpeedInsights />
-
-      {/* Blurred overlay */}
-      {isBlurred && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-          onClick={() => setIsBlurred(false)}
-          role="button"
-          tabIndex={0}
-          aria-label="Dismiss overlay"
-        >
-          <div className="text-white text-2xl cursor-pointer">Click to Unblur</div>
+        {/* Header */}
+        <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 flex justify-between items-center">
+          <span>💬 One-to-One Chat</span>
+          <span className="flex items-center text-sm gap-2">
+            <span className={h-2 w-2 rounded-full ${onlineUsers > 0 ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}}></span>
+            Online: {onlineUsers}
+          </span>
         </div>
-      )}
-    </>
+
+        {/* Connection Status */}
+        {connectionStatus && (
+          <div className="bg-yellow-200 text-yellow-800 text-center py-1 text-md">
+            {connectionStatus}
+          </div>
+        )}
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+          {messages.map((msg) => (
+            <motion.div
+              key={msg._id}
+              className={relative max-w-[70%] px-4 py-2 rounded-lg text-lg shadow ${msg.sender === 'F' ? 'bg-blue-200 text-black ml-auto text-left' : 'bg-gray-200 text-black mr-auto text-left'}}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {msg.text && <div>{msg.text}</div>}
+              {msg.image && (
+                <div className="mt-2">
+                  <img src={data:image/jpeg;base64,${msg.image}} alt="Uploaded" className="max-w-xs h-auto rounded-md" />
+                  <a href={data:image/jpeg;base64,${msg.image}} download={image_${msg._id}.jpg} className="text-xs text-blue-600 underline block mt-1">Download Image</a>
+                </div>
+              )}
+              {msg.file && (
+                <div className="mt-2">
+                  <a href={https://new-a5px.onrender.com/files/${msg.file}} download={msg.file} className="text-xs text-blue-600 underline block mt-1">
+                    Download File: {msg.file}
+                  </a>
+                </div>
+              )}
+              <div className="absolute right-2 bottom-1 text-xs text-black">
+                <span>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                {readStatus[msg._id] === 'read' && <span className="text-green-500 text-xs ml-2">✓✓</span>}
+                {readStatus[msg._id] === 'sent' && <span className="text-gray-500 text-xs ml-2">✓</span>}
+              </div>
+              <button onClick={() => deleteChatMessage(msg._id)} className="absolute top-2 right-0 text-red-500 text-xl rounded px-1">
+                <FaRegTrashAlt />
+              </button>
+            </motion.div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {isTyping && <div className="text-green-700 text-md px-6 py-2">Someone is typing...</div>}
+
+        {/* Input Section */}
+        <div className="flex items-center gap-3 p-4 border-t border-gray-200 bg-white flex-wrap sm:flex-nowrap">
+          <button onClick={() => setShowEmojiPicker((prev) => !prev)} className="text-2xl text-yellow-500"><FaRegSmile /></button>
+          <label htmlFor="file-input" className="cursor-pointer text-2xl">📎</label>
+          <input id="file-input" type="file" onChange={(e) => setFile(e.target.files[0])} className="hidden" />
+          <input
+            ref={inputRef}
+            value={text}
+            onChange={handleTyping}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="Type your message..."
+          />
+          <button onClick={sendMessage} className="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition">Send</button>
+        </div>
+
+        {showEmojiPicker && (
+          <div className="absolute bottom-24 left-10 z-50">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
+        )}
+      </motion.div>
+     <Analytics />
+      <SpeedInsights />
+      {/* File Manager */}
+      <motion.div
+        className="w-full sm:w-1/3 max-w-6xl bg-white rounded-2xl shadow-lg p-6 mt-6 sm:mt-0 sm:ml-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-xl font-semibold mb-4 text-purple-700">📁 File Manager</h2>
+        <div className="mb-4 flex items-center gap-2">
+          <input type="file" onChange={handleFileChange} />
+          <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 bg-blue-600 text-white rounded">
+            {uploading ? 'Uploading...' : 'Upload'}
+          </button>
+        </div>
+        <ul className="space-y-2">
+          {files.map((file) => (
+            <li key={file._id} className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded">
+              <span>{file.filename}</span>
+              <div>
+                <button onClick={() => handleDownload(file.filename)} className="px-2 py-1 mr-2 bg-green-500 text-white rounded">Download</button>
+                <button onClick={() => handleDeleteFile(file.filename)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </div> </>
   );
 };
 
-export default ChatRoom;
+export default ChatRoom; 
+      
+     
+

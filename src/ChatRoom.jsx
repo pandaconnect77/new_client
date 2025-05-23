@@ -293,14 +293,15 @@ const ChatRoom = ({ role }) => {
                   }}
                 >
                   <div className="flex items-center justify-between">
-<p className="whitespace-pre-wrap flex items-center">
-  {msg.text}
-  {msg.createdAt && (
-    <time className="text-xs text-gray-400 ml-2">
-      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-    </time>
-  )}
-</p>
+                                          
+                        <p className="whitespace-pre-wrap">{msg.text}</p>
+                        {msg.createdAt && (
+                          <time className="text-xs text-gray-400 ml-2">
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </time>
+                        )}
+                      
+
 
                     
                     <button

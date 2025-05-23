@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/react"
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { motion } from 'framer-motion';
@@ -131,7 +128,7 @@ const ChatRoom = ({ role }) => {
   };
 
   const deleteChatMessage = async (id) => {
-    await axios.delete(https://new-a5px.onrender.com/messages/${id});
+    await axios.delete('https://new-a5px.onrender.com/messages/${id}');
   };
 
   const onEmojiClick = (emojiData) => {
@@ -170,12 +167,12 @@ const ChatRoom = ({ role }) => {
   };
 
   const handleDownload = (filename) => {
-    window.open(https://new-a5px.onrender.com/files/${filename}, '_blank');
+    window.open('https://new-a5px.onrender.com/files/${filename}, '_blank'');
   };
 
   const handleDeleteFile = async (filename) => {
     try {
-      await axios.delete(https://new-a5px.onrender.com/files/${filename});
+      await axios.delete('https://new-a5px.onrender.com/files/${filename}');
       fetchFiles();
     } catch (err) {
       console.error('Delete failed:', err);
@@ -231,7 +228,7 @@ const ChatRoom = ({ role }) => {
               )}
               {msg.file && (
                 <div className="mt-2">
-                  <a href={https://new-a5px.onrender.com/files/${msg.file}} download={msg.file} className="text-xs text-blue-600 underline block mt-1">
+                  <a href={'https://new-a5px.onrender.com/files/${msg.file}}' download={msg.file} className="text-xs text-blue-600 underline block mt-1">
                     Download File: {msg.file}
                   </a>
                 </div>

@@ -133,9 +133,13 @@ const ChatRoom = ({ role }) => {
   };
 
   // Send message with optional image/file
-  const sendMessage = () => {
+   const sendMessage = () => {
     if (text.trim() || file) {
-      const msg = { text: text.trim(), sender: role };
+      const msg = {
+        text: text.trim(),
+        sender: role,
+        timestamp: new Date().toISOString(),
+      };
 
       if (file) {
         const reader = new FileReader();
@@ -143,10 +147,12 @@ const ChatRoom = ({ role }) => {
           const imageData = reader.result.split(',')[1];
           msg.image = imageData;
           socket.current.emit('sendMessage', msg);
+          setMessages(prev => [...prev, msg]);
         };
         reader.readAsDataURL(file);
       } else {
         socket.current.emit('sendMessage', msg);
+        setMessages(prev => [...prev, msg]);
       }
 
       setText('');
@@ -154,6 +160,7 @@ const ChatRoom = ({ role }) => {
       setShowEmojiPicker(false);
     }
   };
+
 
   // Delete a chat message by id
   const deleteChatMessage = async (id) => {
@@ -318,12 +325,18 @@ const sendMessage = () => {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="whitespace-pre-wrap">{msg.text} 
-                                  {msg.timestamp
-                                  ? new Date(msg.timestamp).toLocaleTimeString()
-                                  : ''}
-
-                    </p>
+            <div className="font-semibold">{msg.sender}</div>
+                        {msg.text && <div className="text">{msg.text}</div>}
+                        {msg.image && (
+                          <img
+                            src={`data:image/jpeg;base64,${msg.image}`}
+                            alt="Sent"
+                            className="w-32 h-auto mt-2 rounded"
+                          />
+                        )}
+                        <div className="text-xs text-gray-500">
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
                     <button
                       aria-label="Delete message"
                       className="ml-2 text-red-400 hover:text-red-700"

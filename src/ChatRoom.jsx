@@ -133,13 +133,9 @@ const ChatRoom = ({ role }) => {
   };
 
   // Send message with optional image/file
-   const sendMessage = () => {
+  const sendMessage = () => {
     if (text.trim() || file) {
-      const msg = {
-        text: text.trim(),
-        sender: role,
-        timestamp: new Date().toISOString(),
-      };
+      const msg = { text: text.trim(), sender: role };
 
       if (file) {
         const reader = new FileReader();
@@ -147,12 +143,10 @@ const ChatRoom = ({ role }) => {
           const imageData = reader.result.split(',')[1];
           msg.image = imageData;
           socket.current.emit('sendMessage', msg);
-          setMessages(prev => [...prev, msg]);
         };
         reader.readAsDataURL(file);
       } else {
         socket.current.emit('sendMessage', msg);
-        setMessages(prev => [...prev, msg]);
       }
 
       setText('');
@@ -161,11 +155,10 @@ const ChatRoom = ({ role }) => {
     }
   };
 
-
   // Delete a chat message by id
   const deleteChatMessage = async (id) => {
     try {
-      await axios.delete(`https://new-a5px.onrender.com/messages/${id}`);
+      await axios.delete(https://new-a5px.onrender.com/messages/${id});
     } catch (err) {
       console.error('Failed to delete message:', err);
     }
@@ -210,41 +203,16 @@ const ChatRoom = ({ role }) => {
       setUploading(false);
     }
   };
-const sendMessage = () => {
-  if (text.trim() || file) {
-    const msg = {
-      text: text.trim(),
-      sender: role,
-      timestamp: new Date().toISOString(), // ✅ add this
-    };
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result.split(',')[1];
-        msg.image = imageData;
-        socket.current.emit('sendMessage', msg);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      socket.current.emit('sendMessage', msg);
-    }
-
-    setText('');
-    setFile(null);
-    setShowEmojiPicker(false);
-  }
-};
 
   // Download a file by filename
   const handleDownload = (filename) => {
-    window.open(`https://new-a5px.onrender.com/files/${filename}`, '_blank');
+    window.open(https://new-a5px.onrender.com/files/${filename}, '_blank');
   };
 
   // Delete a file by filename
   const handleDeleteFile = async (filename) => {
     try {
-      await axios.delete(`https://new-a5px.onrender.com/files/${filename}`);
+      await axios.delete(https://new-a5px.onrender.com/files/${filename});
       fetchFiles();
     } catch (err) {
       console.error('Delete failed:', err);
@@ -271,9 +239,9 @@ const sendMessage = () => {
       </div>
 
       <div
-        className={`h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
+        className={h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
           isBlurred ? 'blur-3xl' : ''
-        }`}
+        }}
       >
         {/* Chat Room */}
         <motion.div
@@ -287,9 +255,9 @@ const sendMessage = () => {
             <span>💬 One-to-One Chat</span>
             <span className="flex items-center text-sm gap-2">
               <span
-                className={`h-2 w-2 rounded-full ${
+                className={h-2 w-2 rounded-full ${
                   onlineUsers > 0 ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
-                }`}
+                }}
               ></span>
               Online: {onlineUsers}
             </span>
@@ -313,30 +281,22 @@ const sendMessage = () => {
                 key={msg._id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className={`flex ${
+                className={flex ${
                   msg.sender === role ? 'justify-end' : 'justify-start'
-                }`}
+                }}
               >
                 <div
-                  className={`max-w-xs md:max-w-md break-words p-3 rounded-xl shadow-md ${
+                  className={max-w-xs md:max-w-md break-words p-3 rounded-xl shadow-md ${
                     msg.sender === role
                       ? 'bg-purple-500 text-white rounded-br-none'
                       : 'bg-gray-200 text-gray-900 rounded-bl-none'
-                  }`}
+                  }}
                 >
                   <div className="flex items-center justify-between">
-            <div className="font-semibold">{msg.sender}</div>
-                        {msg.text && <div className="text">{msg.text}</div>}
-                        {msg.image && (
-                          <img
-                            src={`data:image/jpeg;base64,${msg.image}`}
-                            alt="Sent"
-                            className="w-32 h-auto mt-2 rounded"
-                          />
-                        )}
-                        <div className="text-xs text-gray-500">
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
+                    <p className="whitespace-pre-wrap">{msg.text}
+                      {msg.createdAt} 
+                    </p> 
+                    
                     <button
                       aria-label="Delete message"
                       className="ml-2 text-red-400 hover:text-red-700"
@@ -347,7 +307,7 @@ const sendMessage = () => {
                   </div>
                   {msg.image && (
                     <img
-                      src={`data:image/png;base64,${msg.image}`}
+                      src={data:image/png;base64,${msg.image}}
                       alt="Sent image"
                       className="rounded-lg mt-2 max-w-full max-h-60 object-contain"
                       loading="lazy"
@@ -480,14 +440,14 @@ const sendMessage = () => {
                     <div className="space-x-2">
                       <button
                         onClick={() => handleDownload(filename)}
-                        aria-label={`Download ${filename}`}
+                        aria-label={Download ${filename}}
                         className="text-blue-500 hover:text-blue-700"
                       >
                         Download
                       </button>
                       <button
                         onClick={() => handleDeleteFile(filename)}
-                        aria-label={`Delete ${filename}`}
+                        aria-label={Delete ${filename}}
                         className="text-red-500 hover:text-red-700"
                       >
                         Delete
@@ -510,4 +470,4 @@ const sendMessage = () => {
   );
 };
 
-export default ChatRoom;
+export default ChatRoom; 

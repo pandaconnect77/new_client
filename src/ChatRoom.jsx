@@ -288,20 +288,35 @@ const ChatRoom = ({ role }) => {
                 <div
                   className={`max-w-xs md:max-w-md break-words p-3 rounded-xl shadow-md ${
                     msg.sender === role
-                      ? 'bg-purple-500 text-white rounded-br-none'
-                      : 'bg-gray-200 text-gray-900 rounded-bl-none'
+                      ? 'bg-emerald-100 text-white rounded-br-none'
+                      : 'bg-indigo-100 text-gray-900 rounded-bl-none'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                    <button
-                      aria-label="Delete message"
-                      className="ml-2 text-red-400 hover:text-red-700"
-                      onClick={() => deleteChatMessage(msg._id)}
-                    >
-                      <FaRegTrashAlt />
-                    </button>
-                  </div>
+                
+                <div
+  key={msg._id}
+  className="flex items-start justify-between  hover:bg-gray-100 rounded-md"
+>
+  {/* Message Text */}
+  <p className="whitespace-pre-wrap text-gray-900 flex-1">{msg.text}</p>
+
+  {/* Time on the right, aligned top with margin-left */}
+  <small className="text-gray-500 text-xs ml-3 mt-1 whitespace-nowrap">
+    {msg.createdAt
+      ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : 'No time'}
+  </small>
+
+  {/* Delete Button */}
+  <button
+    aria-label="Delete message"
+    className="ml-3 text-red-400 hover:text-red-700 transition-colors"
+    onClick={() => deleteChatMessage(msg._id)}
+  >
+    <FaRegTrashAlt size={18} />
+  </button>
+</div>
+
                   {msg.image && (
                     <img
                       src={`data:image/png;base64,${msg.image}`}

@@ -203,6 +203,31 @@ const ChatRoom = ({ role }) => {
       setUploading(false);
     }
   };
+const sendMessage = () => {
+  if (text.trim() || file) {
+    const msg = {
+      text: text.trim(),
+      sender: role,
+      timestamp: new Date().toISOString(), // ✅ add this
+    };
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageData = reader.result.split(',')[1];
+        msg.image = imageData;
+        socket.current.emit('sendMessage', msg);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      socket.current.emit('sendMessage', msg);
+    }
+
+    setText('');
+    setFile(null);
+    setShowEmojiPicker(false);
+  }
+};
 
   // Download a file by filename
   const handleDownload = (filename) => {
@@ -293,7 +318,12 @@ const ChatRoom = ({ role }) => {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
+                    <p className="whitespace-pre-wrap">{msg.text} 
+                                  {msg.timestamp
+                                  ? new Date(msg.timestamp).toLocaleTimeString()
+                                  : ''}
+
+                    </p>
                     <button
                       aria-label="Delete message"
                       className="ml-2 text-red-400 hover:text-red-700"

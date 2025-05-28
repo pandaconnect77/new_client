@@ -226,19 +226,7 @@ const ChatRoom = ({ role }) => {
 
   return (
     <>
-      <div style={{ marginTop: 0, textAlign: 'center' }}>
-        <ins
-          className="adsbygoogle"
-          style={{ display: 'block' }}
-          data-ad-client="ca-pub-1417536970473743"
-          data-ad-slot="6635972753"
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-          ref={adRef}
-        />
-      </div>
-
-      <div
+   <div
         className={`h-full min-h-screen flex flex-col sm:flex-row bg-gradient-to-br from-indigo-100 to-purple-200 px-4 py-6 sm:px-6 sm:py-10 ${
           isBlurred ? 'blur-3xl' : ''
         }`}
@@ -411,7 +399,7 @@ const ChatRoom = ({ role }) => {
         </motion.div>
 
         {/* Files Section */}
-        <motion.div
+        {/* <motion.div
           className="w-full sm:w-1/3 mt-6 sm:mt-0 max-w-md h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -421,9 +409,9 @@ const ChatRoom = ({ role }) => {
             Files Upload & Download
           </div>
 
-          <div className="flex flex-col flex-grow p-4 overflow-y-auto space-y-4">
+          <div className="flex flex-col flex-grow p-4 overflow-y-auto space-y-4"> */}
             {/* File upload controls */}
-            <div className="flex flex-col space-y-2">
+            {/* <div className="flex flex-col space-y-2">
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -438,10 +426,10 @@ const ChatRoom = ({ role }) => {
               >
                 {uploading ? 'Uploading...' : 'Upload'}
               </button>
-            </div>
+            </div> */}
 
             {/* List of files */}
-            <div className="flex-grow overflow-y-auto">
+            {/* <div className="flex-grow overflow-y-auto">
               {files.length > 0 ? (
                 files.map((filename) => (
                   <div
@@ -471,8 +459,10 @@ const ChatRoom = ({ role }) => {
                 <p className="text-gray-500">No files uploaded yet.</p>
               )}
             </div>
-          </div>
-        </motion.div>
+          </div> */}
+        {/* </motion.div> */}
+        
+        
       </div>
 
       {/* Vercel Analytics & Speed Insights */}

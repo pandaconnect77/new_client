@@ -340,55 +340,57 @@ const ChatRoom = ({ role }) => {
           )}
 
           {/* Input Section */}
-          <div className="px-4 py-3 flex items-center border-t border-gray-300 bg-white">
-            <button
-              aria-label="Toggle Emoji Picker"
-              onClick={() => setShowEmojiPicker((val) => !val)}
-              className="mr-2 text-xl text-gray-600 hover:text-purple-500 transition"
-            >
-              <FaRegSmile />
-            </button>
+           {/* Input Section */}
+<div className="px-2 py-2 sm:px-4 sm:py-3 flex flex-wrap sm:flex-nowrap items-center gap-2 border-t border-gray-300 bg-white">
+  <button
+    aria-label="Toggle Emoji Picker"
+    onClick={() => setShowEmojiPicker((val) => !val)}
+    className="text-xl text-gray-600 hover:text-purple-500 transition"
+  >
+    <FaRegSmile />
+  </button>
 
-            <input
-              ref={inputRef}
-              type="text"
-              aria-label="Message input"
-              placeholder="Type your message..."
-              value={text}
-              onChange={handleTyping}
-              className="flex-grow px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-            />
+  <input
+    ref={inputRef}
+    type="text"
+    aria-label="Message input"
+    placeholder="Type your message..."
+    value={text}
+    onChange={handleTyping}
+    className="flex-grow min-w-0 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }}
+  />
 
-            <input
-              type="file"
-              id="fileInput"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="hidden"
-              accept="image/*"
-            />
-            <label
-              htmlFor="fileInput"
-              className="ml-2 px-3 py-2 bg-purple-500 hover:bg-purple-600 rounded-full text-white cursor-pointer"
-              title="Attach image"
-            >
-              📎
-            </label>
+  <input
+    type="file"
+    id="fileInput"
+    onChange={(e) => setFile(e.target.files[0])}
+    className="hidden"
+    accept="image/*"
+  />
+  <label
+    htmlFor="fileInput"
+    className="px-3 py-2 bg-purple-500 hover:bg-purple-600 rounded-full text-white cursor-pointer"
+    title="Attach image"
+  >
+    📎
+  </label>
 
-            <button
-              onClick={sendMessage}
-              disabled={!text.trim() && !file}
-              aria-label="Send message"
-              className="ml-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Send
-            </button>
-          </div>
+  <button
+    onClick={sendMessage}
+    disabled={!text.trim() && !file}
+    aria-label="Send message"
+    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    Send
+  </button>
+</div>
+
 
           {/* Emoji Picker */}
           {showEmojiPicker && (
@@ -398,74 +400,12 @@ const ChatRoom = ({ role }) => {
           )}
         </motion.div>
 
-        {/* Files Section */}
-        {/* <motion.div
-          className="w-full sm:w-1/3 mt-6 sm:mt-0 max-w-md h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6">
-            Files Upload & Download
-          </div>
-
-          <div className="flex flex-col flex-grow p-4 overflow-y-auto space-y-4"> */}
-            {/* File upload controls */}
-            {/* <div className="flex flex-col space-y-2">
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="file-input file-input-bordered file-input-primary w-full"
-                aria-label="Select file to upload"
-              />
-              <button
-                onClick={handleUpload}
-                disabled={!selectedFile || uploading}
-                className="btn btn-primary"
-                aria-disabled={!selectedFile || uploading}
-              >
-                {uploading ? 'Uploading...' : 'Upload'}
-              </button>
-            </div> */}
-
-            {/* List of files */}
-            {/* <div className="flex-grow overflow-y-auto">
-              {files.length > 0 ? (
-                files.map((filename) => (
-                  <div
-                    key={filename}
-                    className="flex justify-between items-center p-2 border-b border-gray-200"
-                  >
-                    <span className="truncate max-w-xs">{filename}</span>
-                    <div className="space-x-2">
-                      <button
-                        onClick={() => handleDownload(filename)}
-                        aria-label={`Download ${filename}`}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        Download
-                      </button>
-                      <button
-                        onClick={() => handleDeleteFile(filename)}
-                        aria-label={`Delete ${filename}`}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No files uploaded yet.</p>
-              )}
-            </div>
-          </div> */}
-        {/* </motion.div> */}
+   
         
         
       </div>
 
-      {/* Vercel Analytics & Speed Insights */}
+  
       <Analytics />
       <SpeedInsights />
     </>

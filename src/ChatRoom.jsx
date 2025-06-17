@@ -240,7 +240,7 @@ const ChatRoom = ({ role }) => {
         >
           {/* Header */}
           <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 flex justify-between items-center">
-            <span>💬 One-to-One Chat</span>
+            <span>HEllO Panda</span>
             <span className="flex items-center text-sm gap-2">
               <span
                 className={`h-2 w-2 rounded-full ${

@@ -11,6 +11,8 @@ import { motion } from 'framer-motion';
 const ChatRoom = ({ role }) => {
   const adRef = useRef(null);
   const socket = useRef(null);
+  const [zoomImage, setZoomImage] = useState(null);
+const [zoomLevel, setZoomLevel] = useState(1);
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
@@ -307,11 +309,16 @@ const ChatRoom = ({ role }) => {
 
                   {msg.image && (
                     <img
-                      src={`data:image/png;base64,${msg.image}`}
-                      alt="Sent image"
-                      className="rounded-lg mt-2 max-w-full max-h-60 object-contain"
-                      loading="lazy"
-                    />
+                    src={`data:image/png;base64,${msg.image}`}
+                    alt="Sent image"
+                    className="rounded-lg mt-2 max-w-full max-h-60 object-contain cursor-pointer"
+                    loading="lazy"
+                    onClick={() => {
+                      setZoomImage(`data:image/png;base64,${msg.image}`);
+                      setZoomLevel(1);
+                    }}
+                  />
+
                   )}
                   <div className="text-xs text-right text-gray-500 mt-1 select-none">
                     {msg.timestamp
@@ -326,6 +333,43 @@ const ChatRoom = ({ role }) => {
                     )}
                   </div>
                 </div>
+                {zoomImage && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center">
+    <div className="relative max-w-full max-h-full overflow-hidden">
+      <img
+        src={zoomImage}
+        alt="Zoomed"
+        style={{ transform: `scale(${zoomLevel})` }}
+        className="max-w-full max-h-screen object-contain transition-transform duration-300"
+      />
+      {/* Close button */}
+      <button
+        onClick={() => setZoomImage(null)}
+        className="absolute top-2 right-2 text-white text-2xl"
+        aria-label="Close"
+      >
+        ✖
+      </button>
+
+      {/* Zoom controls */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
+        <button
+          onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 3))}
+          className="px-4 py-2 bg-white text-black rounded-full shadow"
+        >
+          ➕ Zoom In
+        </button>
+        <button
+          onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 1))}
+          className="px-4 py-2 bg-white text-black rounded-full shadow"
+        >
+          ➖ Zoom Out
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
               </motion.div>
             ))}
 

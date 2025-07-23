@@ -444,7 +444,69 @@ const [zoomLevel, setZoomLevel] = useState(1);
           )}
         </motion.div>
 
-   
+    <motion.div
+    className="w-full sm:w-1/3 max-w-sm h-[90vh] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.5 }}
+  >
+    <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 text-center">
+      📁 Shared Files
+    </div>
+
+    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      {files.length === 0 ? (
+        <p className="text-center text-gray-500">No files uploaded yet.</p>
+      ) : (
+        files.map((file, index) => (
+          <div
+            key={index}
+            className="bg-indigo-50 rounded-lg px-3 py-2 flex justify-between items-center shadow-sm"
+          >
+            <span className="truncate text-sm font-medium">{file.filename}</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleDownload(file.filename)}
+                className="text-blue-500 hover:text-blue-700"
+                title="Download"
+              >
+                ⬇️
+              </button>
+              <button
+                onClick={() => handleDeleteFile(file.filename)}
+                className="text-red-500 hover:text-red-700"
+                title="Delete"
+              >
+                ❌
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+
+    <div className="p-4 border-t">
+      <input
+        type="file"
+        id="uploadFile"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <label
+        htmlFor="uploadFile"
+        className="block text-center py-2 mb-2 bg-purple-500 text-white rounded-lg cursor-pointer hover:bg-purple-600 transition"
+      >
+        📎 Select File
+      </label>
+      <button
+        onClick={handleUpload}
+        disabled={uploading || !selectedFile}
+        className="w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+      >
+        {uploading ? 'Uploading...' : 'Upload'}
+      </button>
+    </div>
+  </motion.div>
         
         
       </div>

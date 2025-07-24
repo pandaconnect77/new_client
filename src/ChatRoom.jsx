@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-
+import Video from './Video';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
@@ -510,7 +510,7 @@ const [zoomLevel, setZoomLevel] = useState(1);
         
         
       </div>
-
+<Video/>
   
       <Analytics />
       <SpeedInsights />

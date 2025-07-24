@@ -1,59 +1,52 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-import Video from './Video';
+
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 import { motion } from 'framer-motion';
-
+import Video from './Video';
 const ChatRoom = ({ role }) => {
-  const adRef = useRef(null);
   const socket = useRef(null);
-  const [zoomImage, setZoomImage] = useState(null);
-const [zoomLevel, setZoomLevel] = useState(1);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [file, setFile] = useState(null);
+  const [zoomImage, setZoomImage] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState('');
-  const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
   const [isBlurred, setIsBlurred] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [readStatus, setReadStatus] = useState({});
 
-  // Initialize socket once on mount
   useEffect(() => {
-    socket.current = io('https://new-a5px.onrender.com');
+    socket.current = io('http://localhost:5000');
 
-    // Fetch initial messages
-    axios.get('https://new-a5px.onrender.com/messages')
+    axios.get('http://localhost:5000/messages')
       .then((res) => setMessages(res.data))
       .catch(console.error);
 
-    // Notify server user connected
     socket.current.emit('userConnected', role);
 
-    // Socket event listeners
     socket.current.on('message', (msg) => {
       setMessages((prev) => [...prev, msg]);
-      setReadStatus((prevStatus) => ({ ...prevStatus, [msg._id]: 'sent' }));
+      setReadStatus((prev) => ({ ...prev, [msg._id]: 'sent' }));
     });
 
     socket.current.on('deleteMessage', (id) => {
       setMessages((prev) => prev.filter((m) => m._id !== id));
     });
 
-    socket.current.on('updateOnlineUsers', (count) => {
-      setOnlineUsers(count);
-    });
+    socket.current.on('updateOnlineUsers', (count) => setOnlineUsers(count));
 
     socket.current.on('userStatus', (msg) => {
       setConnectionStatus(msg);
@@ -64,69 +57,54 @@ const [zoomLevel, setZoomLevel] = useState(1);
     socket.current.on('stopTyping', () => setIsTyping(false));
 
     socket.current.on('readMessage', (messageId) => {
-      setReadStatus((prevStatus) => ({ ...prevStatus, [messageId]: 'read' }));
+      setReadStatus((prev) => ({ ...prev, [messageId]: 'read' }));
     });
 
-    // Adsense push
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (e) {
       console.error('Adsense error', e);
     }
 
-    // Keyboard events
-    const handleTabPress = (event) => {
-      if (event.key === 'Tab') {
-        event.preventDefault();
+    const handleTab = (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
         window.open('https://www.google.com/', '_blank');
       }
     };
 
-    const handleF1Press = (event) => {
-      if (event.key === 'F1' || event.key === 'Shift') {
-        event.preventDefault();
+    const handleF1 = (e) => {
+      if (e.key === 'F1' || e.key === 'Shift') {
+        e.preventDefault();
         setIsBlurred(true);
       }
     };
 
-    window.addEventListener('keydown', handleTabPress);
-    window.addEventListener('keydown', handleF1Press);
+    window.addEventListener('keydown', handleTab);
+    window.addEventListener('keydown', handleF1);
 
-    // Cleanup on unmount
     return () => {
       socket.current.emit('userDisconnected', role);
-      socket.current.off('message');
-      socket.current.off('deleteMessage');
-      socket.current.off('updateOnlineUsers');
-      socket.current.off('userStatus');
-      socket.current.off('typing');
-      socket.current.off('stopTyping');
-      socket.current.off('readMessage');
-      window.removeEventListener('keydown', handleTabPress);
-      window.removeEventListener('keydown', handleF1Press);
       socket.current.disconnect();
+      window.removeEventListener('keydown', handleTab);
+      window.removeEventListener('keydown', handleF1);
     };
   }, [role]);
 
-  // Scroll to bottom on messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Auto-focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Handle typing event with throttling
   const handleTyping = (e) => {
     setText(e.target.value);
-
     if (!isTyping) {
       setIsTyping(true);
       socket.current.emit('typing', { sender: role });
     }
-
     clearTimeout(window.typingTimeout);
     window.typingTimeout = setTimeout(() => {
       setIsTyping(false);
@@ -134,7 +112,6 @@ const [zoomLevel, setZoomLevel] = useState(1);
     }, 1500);
   };
 
-  // Send message with optional image/file
   const sendMessage = () => {
     if (text.trim() || file) {
       const msg = { text: text.trim(), sender: role };
@@ -142,8 +119,7 @@ const [zoomLevel, setZoomLevel] = useState(1);
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          const imageData = reader.result.split(',')[1];
-          msg.image = imageData;
+          msg.image = reader.result.split(',')[1];
           socket.current.emit('sendMessage', msg);
         };
         reader.readAsDataURL(file);
@@ -157,24 +133,19 @@ const [zoomLevel, setZoomLevel] = useState(1);
     }
   };
 
-  // Delete a chat message by id
-  const deleteChatMessage = async (id) => {
+  const deleteMessage = async (id) => {
     try {
-      await axios.delete(`https://new-a5px.onrender.com/messages/${id}`);
+      await axios.delete(`http://localhost:5000/messages/${id}`);
     } catch (err) {
       console.error('Failed to delete message:', err);
     }
   };
 
-  // Emoji picker click handler
-  const onEmojiClick = (emojiData) => {
-    setText((prev) => prev + emojiData.emoji);
-  };
+  const onEmojiClick = (emoji) => setText((prev) => prev + emoji.emoji);
 
-  // Fetch uploaded files list
   const fetchFiles = async () => {
     try {
-      const res = await axios.get('https://new-a5px.onrender.com/files');
+      const res = await axios.get('http://localhost:5000/files');
       setFiles(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Error fetching files:', err);
@@ -182,21 +153,15 @@ const [zoomLevel, setZoomLevel] = useState(1);
     }
   };
 
-  // Handle file select for upload
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
-  // Upload selected file
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
-
     const formData = new FormData();
     formData.append('file', selectedFile);
-
     try {
-      await axios.post('https://new-a5px.onrender.com/upload', formData);
+      await axios.post('http://localhost:5000/upload', formData);
       setSelectedFile(null);
       fetchFiles();
     } catch (err) {
@@ -206,26 +171,22 @@ const [zoomLevel, setZoomLevel] = useState(1);
     }
   };
 
-  // Download a file by filename
   const handleDownload = (filename) => {
-    window.open(`https://new-a5px.onrender.com/files/${filename}`, '_blank');
+    window.open(`http://localhost:5000/files/${filename}`, '_blank');
   };
 
-  // Delete a file by filename
   const handleDeleteFile = async (filename) => {
     try {
-      await axios.delete(`https://new-a5px.onrender.com/files/${filename}`);
+      await axios.delete(`http://localhost:5000/files/${filename}`);
       fetchFiles();
     } catch (err) {
       console.error('Delete failed:', err);
     }
   };
 
-  // Fetch files on mount
   useEffect(() => {
     fetchFiles();
   }, []);
-
   return (
     <>
    <div
@@ -510,8 +471,8 @@ const [zoomLevel, setZoomLevel] = useState(1);
         
         
       </div>
-<Video/>
-  
+
+    <Video/>
       <Analytics />
       <SpeedInsights />
     </>

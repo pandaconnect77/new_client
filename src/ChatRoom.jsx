@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-
+import CallPage from './CallPage';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { FaRegTrashAlt, FaRegSmile } from 'react-icons/fa';
@@ -13,6 +13,7 @@ const ChatRoom = ({ role }) => {
   const socket = useRef(null);
   const [zoomImage, setZoomImage] = useState(null);
 const [zoomLevel, setZoomLevel] = useState(1);
+  const [showCall, setShowCall] = useState(false);
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
@@ -450,8 +451,16 @@ const [zoomLevel, setZoomLevel] = useState(1);
     animate={{ opacity: 1 }}
     transition={{ duration: 0.5 }}
   >
-    <div className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 text-center">
-      📁 Shared Files
+     <div>
+      <div
+        className="bg-purple-600 text-white text-xl font-semibold py-4 px-6 text-center cursor-pointer"
+        onClick={() => setShowCall(true)}
+        
+      >
+        📁 Shared Files
+      </div>
+
+      {showCall && <CallPage />}
     </div>
 
     <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -519,3 +528,4 @@ const [zoomLevel, setZoomLevel] = useState(1);
 };
 
 export default ChatRoom;
+

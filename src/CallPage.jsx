@@ -206,7 +206,7 @@ useEffect(() => {
           <input
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            placeholder="Your ID (e.g. alice)"
+            placeholder="F"
             className="w-full px-3 py-2 border rounded-lg text-sm mb-2"
           />
           <button onClick={register} className="w-full py-2 bg-indigo-600 text-white rounded-lg">
@@ -219,7 +219,7 @@ useEffect(() => {
           <input
             value={targetId}
             onChange={(e) => setTargetId(e.target.value)}
-            placeholder="Target ID (e.g. bob)"
+            placeholder="M"
             className="w-full px-3 py-2 border rounded-lg text-sm mb-2"
           />
           <div className="flex gap-3 justify-center">
@@ -288,3 +288,4 @@ useEffect(() => {
     </div>
   );
 }
+

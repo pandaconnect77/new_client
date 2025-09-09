@@ -17,6 +17,7 @@
     "crypto-browserify": "^3.12.1",
     "emoji-picker-react": "^4.12.2",
     "framer-motion": "^12.10.5",
+    "lucide-react": "^0.543.0",
     "global": "^4.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
